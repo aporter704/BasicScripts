@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --job-name="X"
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=6
+#SBATCH --account="punimX"
+#SBATCH --mem=160000
+#SBATCH --time=40:00:00
+
+
+module load mafft/7.310-with-extensions
+module load iq-tree/2.0.6
+module load beast/1.10.4
+
+raw=/data/cephfs/punimX/raw
+ref=/data/cephfs/punimX/ref
+align=/data/cephfs/punimx/alignments
+tree=/data/cephfs/punimx/tree
+beast//data/cephfs/punimx/beast
+
+cd $align
+
+mafft --6merpair --keeplength --add $raw/X.fasta $ref/ref.fasta >  $align/X.fasta
+
+cd $tree
+
+iqtree2 -T 6 -s $align/X.fasta -st DNA -nt AUTO -m HKY+G -bb 1000 -wbtl
+
+cd $beast 
+
+beast $beast/X.xml
